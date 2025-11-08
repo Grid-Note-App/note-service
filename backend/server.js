@@ -8,19 +8,24 @@ const { OAuth2Client } = require('google-auth-library');
 const axios = require('axios');
 
 async function authenticate(req, res, next) {
+	console.log("Auth request started...");
 	const authHeader = req.headers.authorization;
+	console.log("Auth Header:", authHeader);
 	if (!authHeader || !authHeader.startsWith('Bearer ')) {
 		return res.status(401).json({ error: 'Missing or invalid Authorization header' });
 	}
 	const token = authHeader.split(' ')[1];
+	console.log("Auth Token:", token);
 	try {
 		// Validate access token via Google tokeninfo endpoint
 		const response = await axios.get(`https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${token}`);
 		const payload = response.data;
 		// payload.sub is user id, payload.email is email
 		req.user = { userId: payload.sub, email: payload.email };
+		console.log("Auth User:", req.user);
 		next();
 	} catch (err) {
+		console.error("Auth Error:", err);
 		return res.status(401).json({ error: 'Invalid Google access token' });
 	}
 }
@@ -52,6 +57,9 @@ async function startServer() {
 
 		app.post('/notes', authenticate, async (req, res) => {
 			try {
+				console.log("Create Note Request Body:", req.body);
+				console.log("Authenticated User:", req.user);
+				console.log("UserId: ", req.user.userId);
 				const { Title, Text, notifyAt } = req.body;
 				const note = {
 					Title,
