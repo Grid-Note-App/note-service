@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
-const { OAuth2Client } = require('google-auth-library');
 
 // Google OAuth2 access token auth middleware
 const axios = require('axios');
